@@ -39,11 +39,139 @@ Route::get('/pos', function () {
 })->name('pos.index');
 
 Route::get('/products', function () {
-    return view('dashboard', ['title' => 'Menu & Kategori']);
+    $categories = [
+        ['id' => 1, 'name' => 'Espresso Based', 'slug' => 'espresso-based', 'icon' => 'coffee', 'sort_order' => 1, 'products_count' => 2, 'is_active' => 1],
+        ['id' => 2, 'name' => 'Manual Brew', 'slug' => 'manual-brew', 'icon' => 'coffee', 'sort_order' => 2, 'products_count' => 2, 'is_active' => 1],
+        ['id' => 3, 'name' => 'Non-Coffee', 'slug' => 'non-coffee', 'icon' => 'cup', 'sort_order' => 3, 'products_count' => 2, 'is_active' => 1],
+        ['id' => 4, 'name' => 'Snacks & Pastry', 'slug' => 'snacks-pastry', 'icon' => 'cake', 'sort_order' => 4, 'products_count' => 2, 'is_active' => 1],
+    ];
+
+    $products = [
+        [
+            'id' => 1,
+            'category_id' => 1,
+            'category_name' => 'Espresso Based',
+            'name' => 'Es Kopi Susu Titik Nol',
+            'sku' => 'SKT-ESP01',
+            'price' => 20000,
+            'cost_price' => 7500,
+            'is_active' => 1,
+            'is_sold_out' => 0,
+            'description' => 'Double shot espresso racikan Titik Nol, fresh milk, dan gula aren organik.',
+            'image_url' => '',
+        ],
+        [
+            'id' => 2,
+            'category_id' => 1,
+            'category_name' => 'Espresso Based',
+            'name' => 'Americano Hot / Iced',
+            'sku' => 'SKT-ESP02',
+            'price' => 18000,
+            'cost_price' => 5200,
+            'is_active' => 1,
+            'is_sold_out' => 0,
+            'description' => 'Espresso murni diekstrak sempurna dengan air mineral segar.',
+            'image_url' => '',
+        ],
+        [
+            'id' => 3,
+            'category_id' => 2,
+            'category_name' => 'Manual Brew',
+            'name' => 'V60 Single Origin Pourover',
+            'sku' => 'SKT-MB01',
+            'price' => 24000,
+            'cost_price' => 9000,
+            'is_active' => 1,
+            'is_sold_out' => 0,
+            'description' => 'Biji kopi arabika pilihan diseduh manual metode Hario V60.',
+            'image_url' => '',
+        ],
+        [
+            'id' => 4,
+            'category_id' => 2,
+            'category_name' => 'Manual Brew',
+            'name' => 'Japanese Drip Iced Coffee',
+            'sku' => 'SKT-MB02',
+            'price' => 26000,
+            'cost_price' => 9500,
+            'is_active' => 1,
+            'is_sold_out' => 0,
+            'description' => 'Drip pourover di atas es batu dengan aroma bunga dan citrus menyegarkan.',
+            'image_url' => '',
+        ],
+        [
+            'id' => 5,
+            'category_id' => 3,
+            'category_name' => 'Non-Coffee',
+            'name' => 'Matcha Uji Latte',
+            'sku' => 'SKT-NC01',
+            'price' => 24000,
+            'cost_price' => 9200,
+            'is_active' => 1,
+            'is_sold_out' => 0,
+            'description' => 'Bubuk matcha murni asal Uji Jepang dengan susu segar pilihan.',
+            'image_url' => '',
+        ],
+        [
+            'id' => 6,
+            'category_id' => 3,
+            'category_name' => 'Non-Coffee',
+            'name' => 'Signature Dark Chocolate',
+            'sku' => 'SKT-NC02',
+            'price' => 22000,
+            'cost_price' => 8100,
+            'is_active' => 1,
+            'is_sold_out' => 0,
+            'description' => 'Cokelat hitam premium kental dengan rasa manis pahit yang seimbang.',
+            'image_url' => '',
+        ],
+        [
+            'id' => 7,
+            'category_id' => 4,
+            'category_name' => 'Snacks & Pastry',
+            'name' => 'Croissant Butter Perancis',
+            'sku' => 'SKT-SN01',
+            'price' => 25000,
+            'cost_price' => 13500,
+            'is_active' => 1,
+            'is_sold_out' => 0,
+            'description' => 'Pastry renyah berlapis mentega impor dipanggang hangat.',
+            'image_url' => '',
+        ],
+        [
+            'id' => 8,
+            'category_id' => 4,
+            'category_name' => 'Snacks & Pastry',
+            'name' => 'Truffle Fries Gurih',
+            'sku' => 'SKT-SN02',
+            'price' => 22000,
+            'cost_price' => 9800,
+            'is_active' => 1,
+            'is_sold_out' => 1,
+            'description' => 'Kentang goreng renyah dengan taburan minyak truffle dan keju parmesan.',
+            'image_url' => '',
+        ],
+    ];
+
+    return view('products', [
+        'title' => 'Manajemen Menu & HPP',
+        'categories' => $categories,
+        'products' => $products,
+    ]);
 })->name('products.index');
 
 Route::get('/categories', function () {
-    return view('dashboard', ['title' => 'Kategori Menu']);
+    $categories = [
+        ['id' => 1, 'name' => 'Espresso Based', 'slug' => 'espresso-based', 'icon' => 'coffee', 'sort_order' => 1, 'products_count' => 2, 'is_active' => 1],
+        ['id' => 2, 'name' => 'Manual Brew', 'slug' => 'manual-brew', 'icon' => 'coffee', 'sort_order' => 2, 'products_count' => 2, 'is_active' => 1],
+        ['id' => 3, 'name' => 'Non-Coffee', 'slug' => 'non-coffee', 'icon' => 'cup', 'sort_order' => 3, 'products_count' => 2, 'is_active' => 1],
+        ['id' => 4, 'name' => 'Snacks & Pastry', 'slug' => 'snacks-pastry', 'icon' => 'cake', 'sort_order' => 4, 'products_count' => 2, 'is_active' => 1],
+    ];
+
+    return view('categories', [
+        'title' => 'Manajemen Kategori Menu',
+        'categories' => $categories,
+    ]);
 })->name('categories.index');
 
 Route::get('/ingredients', function () {
