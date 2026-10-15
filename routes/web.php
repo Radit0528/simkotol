@@ -1,6 +1,9 @@
 <?php
 
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 
 /*
 |--------------------------------------------------------------------------
@@ -76,7 +79,80 @@ Route::get('/banners', function () {
 })->name('banners.index');
 
 Route::get('/users', function () {
-    return view('dashboard', ['title' => 'Kelola Staf & Pengguna']);
+    $dbUsers = [];
+    try {
+        if (Schema::hasTable('users')) {
+            $dbUsers = User::all()->map(function ($u) {
+                return [
+                    'id' => $u->id,
+                    'name' => $u->name,
+                    'email' => $u->email,
+                    'role' => $u->role ?? 'kasir',
+                    'phone' => $u->phone ?? '-',
+                    'pin_set' => ! empty($u->pin_code),
+                    'is_active' => $u->is_active ?? 1,
+                    'last_login_at' => ! empty($u->last_login_at) ? Carbon::parse($u->last_login_at)->format('d M Y H:i') : 'Belum pernah',
+                    'created_at' => $u->created_at ? $u->created_at->format('d M Y') : '-',
+                ];
+            })->toArray();
+        }
+    } catch (Throwable $e) {
+        $dbUsers = [];
+    }
+
+    if (empty($dbUsers)) {
+        $dbUsers = [
+            [
+                'id' => 1,
+                'name' => 'Pemilik Kedai (Owner)',
+                'email' => 'owner@titiknol.com',
+                'role' => 'owner',
+                'phone' => '081122334455',
+                'pin_set' => true,
+                'is_active' => 1,
+                'last_login_at' => '15 Okt 2026 10:15',
+                'created_at' => '01 Jan 2026',
+            ],
+            [
+                'id' => 2,
+                'name' => 'Budi Santoso',
+                'email' => 'budi.kasir@titiknol.com',
+                'role' => 'kasir',
+                'phone' => '081234567890',
+                'pin_set' => false,
+                'is_active' => 1,
+                'last_login_at' => '15 Okt 2026 08:30',
+                'created_at' => '10 Jan 2026',
+            ],
+            [
+                'id' => 3,
+                'name' => 'Siti Rahma',
+                'email' => 'siti.kasir@titiknol.com',
+                'role' => 'kasir',
+                'phone' => '081298765432',
+                'pin_set' => false,
+                'is_active' => 1,
+                'last_login_at' => '14 Okt 2026 21:45',
+                'created_at' => '15 Jan 2026',
+            ],
+            [
+                'id' => 4,
+                'name' => 'Andi Pratama',
+                'email' => 'andi.kasir@titiknol.com',
+                'role' => 'kasir',
+                'phone' => '081377889900',
+                'pin_set' => false,
+                'is_active' => 0,
+                'last_login_at' => '01 Okt 2026 17:00',
+                'created_at' => '05 Jan 2026',
+            ],
+        ];
+    }
+
+    return view('staff', [
+        'title' => 'Manajemen Staf & Pengguna',
+        'users' => $dbUsers,
+    ]);
 })->name('users.index');
 
 Route::get('/settings', function () {
