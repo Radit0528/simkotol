@@ -29,7 +29,7 @@ return new class extends Migration
             $table->foreignId('closed_by')->nullable()->comment('beda dengan user_id jika ditutup paksa owner')->constrained('users')->nullOnDelete();
             $table->string('close_notes', 255)->nullable();
             // Menjamin 1 kasir hanya punya 1 shift open (NULL tidak dianggap duplikat)
-            $table->unsignedBigInteger('open_lock')->storedAs("IF(status = 'open', user_id, NULL)")->nullable();
+            $table->unsignedBigInteger('open_lock')->storedAs("CASE WHEN status = 'open' THEN user_id ELSE NULL END")->nullable();
             $table->timestamps();
 
             $table->unique('open_lock', 'uq_shift_one_open_per_user');

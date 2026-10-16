@@ -29,8 +29,40 @@ class UserFactory extends Factory
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
+            'role' => 'kasir',
+            'is_active' => true,
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /**
+     * Set role user menjadi owner.
+     */
+    public function owner(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'owner',
+        ]);
+    }
+
+    /**
+     * Set role user menjadi kasir.
+     */
+    public function kasir(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'role' => 'kasir',
+        ]);
+    }
+
+    /**
+     * Set status user menjadi nonaktif.
+     */
+    public function inactive(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'is_active' => false,
+        ]);
     }
 
     /**
