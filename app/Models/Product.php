@@ -15,6 +15,13 @@ class Product extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $attributes = [
+        'is_active' => true,
+        'is_sold_out' => false,
+        'cost_price' => 0,
+        'sort_order' => 0,
+    ];
+
     protected $fillable = [
         'category_id',
         'sku',
@@ -22,9 +29,10 @@ class Product extends Model
         'description',
         'price',
         'cost_price',
-        'image_path',
+        'image',
         'is_active',
         'is_sold_out',
+        'sort_order',
     ];
 
     protected function casts(): array
@@ -34,6 +42,7 @@ class Product extends Model
             'cost_price' => 'integer',
             'is_active' => 'boolean',
             'is_sold_out' => 'boolean',
+            'sort_order' => 'integer',
         ];
     }
 
@@ -74,5 +83,27 @@ class Product extends Model
         $hpp = $this->cost_price > 0 ? $this->cost_price : $this->calculateHpp();
 
         return round((($this->price - $hpp) / $this->price) * 100, 1);
+    }
+
+    /**
+     * URL publik foto menu.
+     */
+    public function getImageUrlAttribute(): ?string
+    {
+        if (! $this->image) {
+            return null;
+        }
+
+        return \Illuminate\Support\Facades\Storage::disk('public')->url($this->image);
+    }
+
+    /**
+     * Cek apakah produk menu sudah memiliki riwayat transaksi di order_items (BR-40).
+     */
+    public function hasTransactions(): bool
+    {
+        return \Illuminate\Support\Facades\DB::table('order_items')
+            ->where('product_id', $this->id)
+            ->exists();
     }
 }
