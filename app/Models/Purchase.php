@@ -45,4 +45,12 @@ class Purchase extends Model
     {
         return $this->hasMany(PurchaseItem::class, 'purchase_id');
     }
+
+    /**
+     * Relasi ke mutasi stok yang dihasilkan oleh pembelian ini.
+     */
+    public function stockMutations(): HasMany
+    {
+        return $this->hasMany(StockMutation::class, 'purchase_id');
+    }
 }
