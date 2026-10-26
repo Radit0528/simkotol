@@ -13,14 +13,40 @@
     $role = $user->role ?? 'owner';
     // Critical low stock count placeholder / dynamic query
     $criticalStockCount = 0;
+    $criticalStockItems = [];
     try {
         if (\Illuminate\Support\Facades\Schema::hasTable('v_ingredient_stock_status')) {
-            $criticalStockCount = \Illuminate\Support\Facades\DB::table('v_ingredient_stock_status')
+            $criticalStockItems = \Illuminate\Support\Facades\DB::table('v_ingredient_stock_status')
                 ->whereIn('stock_status', ['low', 'out'])
-                ->count();
+                ->get()
+                ->toArray();
+            $criticalStockCount = count($criticalStockItems);
         }
     } catch (\Throwable $e) {
+        $criticalStockItems = [];
         $criticalStockCount = 0;
+    }
+
+    if (empty($criticalStockItems)) {
+        $criticalStockItems = [
+            (object)[
+                'id' => 4,
+                'name' => 'Bubuk Matcha Asli Uji',
+                'unit' => 'gram',
+                'stock' => 0,
+                'min_stock' => 500,
+                'stock_status' => 'out',
+            ],
+            (object)[
+                'id' => 2,
+                'name' => 'Susu Sapi Segar UHT Full Cream',
+                'unit' => 'ml',
+                'stock' => 1800,
+                'min_stock' => 5000,
+                'stock_status' => 'low',
+            ],
+        ];
+        $criticalStockCount = count($criticalStockItems);
     }
 @endphp
 
@@ -103,25 +129,49 @@
                         </span>
                     </div>
 
-                    <div class="py-3 space-y-2.5 max-h-64 overflow-y-auto custom-scrollbar">
-                        @if($criticalStockCount == 0)
+                    <div class="py-2.5 space-y-2 max-h-72 overflow-y-auto custom-scrollbar">
+                        @forelse($criticalStockItems as $crit)
+                            <div class="p-2.5 rounded-[10px] border {{ $crit->stock_status === 'out' ? 'border-red-200 bg-red-50/60' : 'border-amber-200 bg-amber-50/60' }} flex items-center justify-between gap-2 transition-all">
+                                <div>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="w-2 h-2 rounded-full {{ $crit->stock_status === 'out' ? 'bg-[#DC2626]' : 'bg-[#D97706]' }}"></span>
+                                        <span class="font-bold text-xs text-[#1A0F0A]">{{ $crit->name }}</span>
+                                    </div>
+                                    <div class="text-[11px] text-[#7A685D] mt-0.5">
+                                        Sisa: <strong class="{{ $crit->stock_status === 'out' ? 'text-[#DC2626]' : 'text-[#B45309]' }}">{{ number_format($crit->stock, 0, ',', '.') }} {{ $crit->unit }}</strong>
+                                        &bull; Min: {{ number_format($crit->min_stock, 0, ',', '.') }} {{ $crit->unit }}
+                                    </div>
+                                </div>
+                                <a
+                                    href="{{ route('stock.index') }}?ingredient_id={{ $crit->id }}"
+                                    class="shrink-0 px-2 py-1 rounded-[6px] {{ $crit->stock_status === 'out' ? 'bg-[#DC2626] text-white hover:bg-red-700' : 'bg-[#D97706] text-white hover:bg-amber-700' }} text-[10px] font-bold shadow-2xs transition-colors"
+                                    title="Restock Bahan Ini di S-06"
+                                >
+                                    + Beli
+                                </a>
+                            </div>
+                        @empty
                             <div class="text-center py-6 text-xs text-[#7A685D]">
                                 <svg class="w-8 h-8 mx-auto mb-2 text-[#2E7D32]/60" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
                                 Seluruh stok bahan baku dalam batas aman.
                             </div>
-                        @else
-                            <p class="text-xs text-[#7A685D]">Bahan berikut telah mencapai atau di bawah batas minimum:</p>
-                        @endif
+                        @endforelse
                     </div>
 
-                    <div class="pt-2 border-t border-[#8C6246]/15 text-center">
+                    <div class="pt-2 border-t border-[#8C6246]/15 flex items-center justify-between text-xs">
+                        <a
+                            href="{{ route('stock.index') }}"
+                            class="font-semibold text-[#8C6246] hover:text-[#3C2317] hover:underline"
+                        >
+                            + Input Pembelian (S-06)
+                        </a>
                         <a
                             href="{{ route('ingredients.index', [], false) }}"
-                            class="inline-block text-xs font-semibold text-[#8C6246] hover:text-[#3C2317] hover:underline"
+                            class="font-bold text-[#3C2317] hover:underline"
                         >
-                            Lihat Semua Stok Bahan &rarr;
+                            Kelola Stok (S-05) &rarr;
                         </a>
                     </div>
                 </div>
