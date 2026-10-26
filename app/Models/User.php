@@ -79,4 +79,40 @@ class User extends Authenticatable
     {
         return $this->role === 'kasir';
     }
+
+    /**
+     * Relasi ke shift kerja kasir.
+     */
+    public function shifts(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Shift::class, 'user_id');
+    }
+
+    /**
+     * Cek apakah user sedang memiliki shift yang masih berstatus OPEN (US-02, BR-01, BR-02).
+     */
+    public function hasOpenShift(): bool
+    {
+        return \Illuminate\Support\Facades\DB::table('shifts')
+            ->where('user_id', $this->id)
+            ->where('status', 'open')
+            ->exists();
+    }
+
+    /**
+     * Cek apakah user sudah memiliki riwayat transaksi dalam sistem (BR-39).
+     * Meliputi pesanan, shift, pembelian stok, kas shift, pembayaran, atau void.
+     */
+    public function hasTransactions(): bool
+    {
+        return \Illuminate\Support\Facades\DB::table('orders')->where('cashier_id', $this->id)->exists()
+            || \Illuminate\Support\Facades\DB::table('shifts')->where('user_id', $this->id)->exists()
+            || \Illuminate\Support\Facades\DB::table('purchases')->where('user_id', $this->id)->exists()
+            || \Illuminate\Support\Facades\DB::table('shift_cash_movements')->where('user_id', $this->id)->exists()
+            || \Illuminate\Support\Facades\DB::table('payments')->where('created_by', $this->id)->exists()
+            || \Illuminate\Support\Facades\DB::table('order_voids')
+                ->where('requested_by', $this->id)
+                ->orWhere('approved_by', $this->id)
+                ->exists();
+    }
 }
