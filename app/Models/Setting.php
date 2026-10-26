@@ -23,6 +23,21 @@ class Setting extends Model
     ];
 
     /**
+     * The "booted" method of the model.
+     * Mengosongkan cache setting secara otomatis setiap ada perubahan.
+     */
+    protected static function booted(): void
+    {
+        static::saved(function () {
+            \Illuminate\Support\Facades\Cache::forget('simkotol.settings.all');
+        });
+
+        static::deleted(function () {
+            \Illuminate\Support\Facades\Cache::forget('simkotol.settings.all');
+        });
+    }
+
+    /**
      * Relasi ke user yang terakhir memperbarui setting.
      */
     public function updatedBy(): BelongsTo
