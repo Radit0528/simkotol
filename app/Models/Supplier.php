@@ -35,4 +35,12 @@ class Supplier extends Model
     {
         return $this->hasMany(Purchase::class, 'supplier_id');
     }
+
+    /**
+     * Memeriksa apakah supplier memiliki riwayat transaksi pembelian (BR-40).
+     */
+    public function hasPurchases(): bool
+    {
+        return $this->purchases()->exists();
+    }
 }

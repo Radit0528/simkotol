@@ -54,6 +54,47 @@ class Ingredient extends Model
     }
 
     /**
+     * Relasi ke item pembelian bahan baku.
+     */
+    public function purchaseItems(): HasMany
+    {
+        return $this->hasMany(PurchaseItem::class, 'ingredient_id');
+    }
+
+    /**
+     * Memeriksa apakah bahan baku memiliki resep terhubung.
+     */
+    public function hasRecipes(): bool
+    {
+        return $this->recipes()->exists();
+    }
+
+    /**
+     * Memeriksa apakah bahan baku memiliki mutasi stok.
+     */
+    public function hasMutations(): bool
+    {
+        return $this->stockMutations()->exists();
+    }
+
+    /**
+     * Memeriksa apakah satuan bahan baku masih dapat diubah (US-06).
+     * Satuan tidak bisa diubah setelah ada resep atau mutasi stok.
+     */
+    public function canChangeUnit(): bool
+    {
+        return ! $this->hasRecipes() && ! $this->hasMutations();
+    }
+
+    /**
+     * Memeriksa apakah bahan baku memiliki riwayat transaksi/mutasi/resep (BR-40).
+     */
+    public function hasTransactions(): bool
+    {
+        return $this->hasMutations() || $this->purchaseItems()->exists() || $this->hasRecipes();
+    }
+
+    /**
      * Status stok: 'out' (<= 0), 'low' (<= min_stock), atau 'ok' (aman).
      */
     public function getStockStatusAttribute(): string
